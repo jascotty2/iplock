@@ -1,0 +1,42 @@
+#######################################
+##      IpLock Configuration         ##
+#######################################
+
+# whether names should be checked to be frem the same subnet as before if ip is different
+checkSubnet: true
+
+# block users if name is not alphanumerical?
+blockSpecialChars: true
+
+# max username length allowed to login
+max_namelen: 20
+
+# will hold a temp. user cache in plugin, to lower resource usage during a login
+#   use this to change how long it is considered current (seconds)
+tempCacheTTL: 10
+
+# what to use for tablename/filename
+tableName: iplockusers
+
+# use mysql?
+useMySQLUserDB: false
+
+MySQL:
+    # database to use in MySQL
+    database: minecraft
+    # MySQL Login Username
+    username: root
+    # MySQL Login Password
+    password: root
+    # MySQL Connection Hostname (IP)
+    Hostname: localhost
+    # MySQL Connection Port Number
+    Port: 3306
+    
+# whether certain names get special treatment
+# include - only check the listed names
+# exclude - don't check the listed names
+# none (default) - everyone is checked
+checkOption: none
+# list of users to apply the above rule to (space or comma-delimited)
+users: 

@@ -1,0 +1,38 @@
+iplock - limit 1 ip address per player 
+
+Commands: 
+iplock (ipl) reload	reloads plugin configuration
+iplock	reset <user>	reset (delete) ip info for this user, so they can login
+
+
+Changelog:
+
+Version 1.0 - jascotty2
+added configuration file
+user db is not (permamently) cached - read in at each check
+MySQL support
+grabs ip, not the hostname
+added OP commands for plugin management
+can list users to check or ignore check
+
+
+Version 0.024
+Replaced immediate save function with timer save (every minute)
+
+Version 0.023
+Changes for special characters/long names (not included in this plugin dist)
+
+Version 0.022
+Workaround for onjoin chunk error
+Tested for #535
+
+Version 0.021
+Updated to the required namespace convention
+
+Version 0.02
+Added a fix for loading player data
+
+Version 0.1
+Initial release
+
+
