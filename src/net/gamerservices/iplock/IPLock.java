@@ -1,5 +1,6 @@
 package net.gamerservices.iplock;
 
+import com.jascotty2.Str;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -9,14 +10,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
-public class iplock extends JavaPlugin {
+public class IPLock extends JavaPlugin {
 
     protected final static Logger logger = Logger.getLogger("Minecraft");
     public static final String name = "IpLock";
     private final PListener playerListener = new PListener(this);
-    public static iplockconfig config = new iplockconfig();
-    public static IpLockUsers users = null;
+    protected static IPLockConfig config = new IPLockConfig();
+    protected static IPLockUsers users = null;
 
     public void onDisable() {
         System.out.println("iplock disabled");
@@ -29,8 +31,18 @@ public class iplock extends JavaPlugin {
         pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Normal, this);
         pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_DROP_ITEM, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_PICKUP_ITEM, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_CHAT, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_COMMAND_PREPROCESS, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.PLAYER_TELEPORT, playerListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.ENTITY_DAMAGE, PListener.damageListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.ENTITY_COMBUST, PListener.damageListener, Priority.Normal, this);
+        pm.registerEvent(Event.Type.ENTITY_TARGET, PListener.damageListener, Priority.Normal, this);
 
-        users = new IpLockUsers();
+        users = new IPLockUsers();
         if (!users.load()) {
             Log(Level.SEVERE, "Failed to load users database!");
             //this.setEnabled(false);
@@ -51,7 +63,7 @@ public class iplock extends JavaPlugin {
                 } else if (args[0].equalsIgnoreCase("reload")) {
                     if (config.load()) {
                         sender.sendMessage("Cofiguration Reloaded");
-                        users = new IpLockUsers();
+                        users = new IPLockUsers();
                         if (!users.load()) {
                             sender.sendMessage("Failed to load users database!");
                         } else {
@@ -62,7 +74,9 @@ public class iplock extends JavaPlugin {
                     }
                 } else if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
                     if (users.setUser(args[1], "")) {
-                        sender.sendMessage(args[1] + " IP was reset");
+                        //playerListener.removePlayerPassWait(args[1]);
+                        playerListener.removePlayerAttempts(args[1]);
+                        sender.sendMessage(args[1] + " login information was reset");
                     } else {
                         sender.sendMessage("IP Reset Error");
                     }
@@ -73,9 +87,22 @@ public class iplock extends JavaPlugin {
                 sender.sendMessage("IpLock is for OPs only!");
             }
             return true;
+        }else if(command.getName().equalsIgnoreCase("passwd")){
+            if(sender instanceof Player){
+                if (PListener.active.containsKey(((Player)sender).getName())) {
+                    playerListener.passwordTried((Player)sender, Str.argStr(args));
+                }else{
+                    sender.sendMessage("You are not locked");
+                }
+            }else{
+                sender.sendMessage("password unlock for players only");
+            }
+            
+            return true;
         }
         return false;
     }
+    
 
     public static void Log(String txt) {
         logger.log(Level.INFO, String.format("[%s] %s", name, txt));

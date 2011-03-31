@@ -1,11 +1,12 @@
 /**
  * Programmer: Jacob Scott
- * Program Name: iplockconfig
- * Description: adds configurable options to iplock
+ * Program Name: IPLockConfig
+ * Description: adds configurable options to IPLock
  * Date: Mar 17, 2011
  */
 package net.gamerservices.iplock;
 
+import com.jascotty2.CheckInput;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.util.logging.Level;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 
-public class iplockconfig {
+public class IPLockConfig {
 
     public final static File configFolder = new File("plugins", "iplock"); //  getDataFolder();
     public final static File configfile = new File(configFolder, "config.yml");
@@ -28,6 +29,11 @@ public class iplockconfig {
     private DBType databaseType = DBType.FLATFILE;
     protected ArrayList<String> userList = new ArrayList<String>();
     protected UserListAction userListMode = UserListAction.NONE;
+
+    public boolean passwordUpdate = false, passwordLock = false;
+    public String defaultPass = "password";
+    public long passTimeout = 30, retryTime = 3600;
+    public int maxAttempts = 3;
 
     public enum DBType {
 
@@ -47,7 +53,7 @@ public class iplockconfig {
         return databaseType == DBType.FLATFILE;
     }
 
-    public iplockconfig() {
+    public IPLockConfig() {
         load();
     } // end default constructor
 
@@ -59,9 +65,9 @@ public class iplockconfig {
         }
         if (!configfile.exists()) {
             try {
-                iplock.Log(Level.INFO, configfile.getName() + " not found. Creating new file.");
+                IPLock.Log(Level.INFO, configfile.getName() + " not found. Creating new file.");
                 configfile.createNewFile();
-                InputStream res = iplockconfig.class.getResourceAsStream("/config.yml");
+                InputStream res = IPLockConfig.class.getResourceAsStream("/config.yml");
                 FileWriter tx = new FileWriter(configfile);
                 try {
                     for (int i = 0; (i = res.read()) > 0;) {
@@ -73,7 +79,7 @@ public class iplockconfig {
                     res.close();
                 }
             } catch (IOException ex) {
-                iplock.Log(Level.SEVERE, "Failed creating new config file ", ex);
+                IPLock.Log(Level.SEVERE, "Failed creating new config file ", ex);
                 return false;
             }
         } else {
@@ -108,13 +114,39 @@ public class iplockconfig {
                     sql_hostName = n.getString("Hostname", sql_hostName);
                     sql_portNum = n.getString("Port", sql_portNum);
                 } else {
-                    iplock.Log(Level.WARNING, "MySQL section in " + configfile.getName() + " is missing");
+                    IPLock.Log(Level.WARNING, "MySQL section in " + configfile.getName() + " is missing");
                 }
             }
+            
+            passwordUpdate = config.getBoolean("passwordUpdate", passwordUpdate);
+            passwordLock = config.getBoolean("passwordLock", passwordLock);
+            defaultPass = config.getString("defaultPass", defaultPass);
+            maxAttempts = config.getInt("maxAttempts", maxAttempts);
+            String t = config.getString("passTimeout");
+            if(t!=null){
+                try {
+                    passTimeout = CheckInput.GetBigInt_TimeSpanInSec(t, 's').longValue();
+                } catch (Exception ex) {
+                    IPLock.logger.log(Level.WARNING, "passTimeout has an illegal value", ex);
+                }
+            }
+            t = config.getString("retryTime");
+            if(t!=null){
+                try {
+                    retryTime = CheckInput.GetBigInt_TimeSpanInSec(t, 's').longValue();
+                } catch (Exception ex) {
+                    IPLock.logger.log(Level.WARNING, "retryTime has an illegal value", ex);
+                }
+            }
+            
+
         }
         return true;
     }
 
+    public boolean listModeNone(){
+        return userListMode == UserListAction.NONE;
+    }
     public boolean checkUser(String name) {
         if (userListMode == UserListAction.IGNORE) {
             return !userList.contains(name.toLowerCase());
@@ -123,5 +155,5 @@ public class iplockconfig {
         }
         return true;
     }
-} // end class iplockconfig
+} // end class IPLockConfig
 

@@ -1,6 +1,6 @@
 /**
  * Programmer: Jacob Scott
- * Program Name: IpLockUsers
+ * Program Name: IPLockUsers
  * Description:
  * Date: Mar 17, 2011
  */
@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 
-public class IpLockUsers {
+public class IPLockUsers {
 
     private HashMap<String, String> iplockUsers = new HashMap<String, String>();
     // last time the cache was updated
@@ -28,40 +28,40 @@ public class IpLockUsers {
     File iplockUsersFile = null;
     MySQL_UserIp MySQL_list = null;
 
-    public IpLockUsers() {
+    public IPLockUsers() {
     } // end default constructor
 
     public boolean load() {
-        if (iplock.config.useFlatfile()) {
-            return loadFile(iplock.config.tableName + ".csv");
+        if (IPLock.config.useFlatfile()) {
+            return loadFile(IPLock.config.tableName + ".csv");
         } else {
             try {
-                return loadMySQL(iplock.config.sql_database,
-                        iplock.config.tableName,
-                        iplock.config.sql_username,
-                        iplock.config.sql_password,
-                        iplock.config.sql_hostName,
-                        iplock.config.sql_portNum);
+                return loadMySQL(IPLock.config.sql_database,
+                        IPLock.config.tableName,
+                        IPLock.config.sql_username,
+                        IPLock.config.sql_password,
+                        IPLock.config.sql_hostName,
+                        IPLock.config.sql_portNum);
             } catch (SQLException ex) {
-                iplock.Log(Level.SEVERE, null, ex);
+                IPLock.Log(Level.SEVERE, null, ex);
             } catch (Exception ex) {
-                iplock.Log(Level.SEVERE, null, ex);
+                IPLock.Log(Level.SEVERE, null, ex);
             }
         }
         return false;
     }
 
     public boolean reload() {
-        if (iplock.config.useFlatfile()) {
+        if (IPLock.config.useFlatfile()) {
             return loadFile(iplockusersFilename);
         } else {
             if (MySQL_list != null) {
                 try {
                     return MySQL_list.connect();
                 } catch (SQLException ex) {
-                    iplock.Log(Level.SEVERE, null, ex);
+                    IPLock.Log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
-                    iplock.Log(Level.SEVERE, null, ex);
+                    IPLock.Log(Level.SEVERE, null, ex);
                 }
             }
             return false;
@@ -74,15 +74,15 @@ public class IpLockUsers {
             MySQL_list = null;
         }
         iplockusersFilename = filename;
-        iplockUsersFile = new File(iplockconfig.configFolder.getAbsolutePath() + File.separator + filename);
+        iplockUsersFile = new File(IPLockConfig.configFolder.getAbsolutePath() + File.separator + filename);
         if (!iplockUsersFile.exists()) {
             try {
-                iplock.Log("Creating iplock user file");
+                IPLock.Log("Creating iplock user file");
                 iplockUsersFile.createNewFile();
                 return true;
             } catch (IOException e) {
-                iplock.Log(Level.SEVERE, "Error creating users file " + filename);
-                iplock.Log(Level.SEVERE, e);
+                IPLock.Log(Level.SEVERE, "Error creating users file " + filename);
+                IPLock.Log(Level.SEVERE, e);
                 return false;
             }
         } else {
@@ -99,9 +99,9 @@ public class IpLockUsers {
                 MySQL_list.connect(database, tableName, username, password, hostName, portNum);
             }
         } catch (SQLException ex) {
-            iplock.Log(Level.SEVERE, "Error connecting to MySQL database or while retrieving table list", ex);
+            IPLock.Log(Level.SEVERE, "Error connecting to MySQL database or while retrieving table list", ex);
         } catch (Exception ex) {
-            iplock.Log(Level.SEVERE, "Failed to start database connection", ex);
+            IPLock.Log(Level.SEVERE, "Failed to start database connection", ex);
         }
         if (MySQL_list == null || !MySQL_list.IsConnected()) {
             MySQL_list = null;
@@ -115,15 +115,15 @@ public class IpLockUsers {
 
     public boolean updateCache(boolean forceUpdate) {
         if (forceUpdate || lastCacheUpdate == null
-                || (((new Date()).getTime() - lastCacheUpdate.getTime()) < iplock.config.cacheTTL * 1000)) {
-            if (iplock.config.useMySQL() && MySQL_list != null) {
+                || (((new Date()).getTime() - lastCacheUpdate.getTime()) < IPLock.config.cacheTTL * 1000)) {
+            if (IPLock.config.useMySQL() && MySQL_list != null) {
                 try {
                     iplockUsers = MySQL_list.GetFullList();
                     return true;
                 } catch (SQLException ex) {
-                    iplock.Log(Level.SEVERE, null, ex);
+                    IPLock.Log(Level.SEVERE, null, ex);
                 } catch (Exception ex) {
-                    iplock.Log(Level.SEVERE, null, ex);
+                    IPLock.Log(Level.SEVERE, null, ex);
                 }
                 return false;
             } else { // databaseType == DBType.FLATFILE
@@ -142,19 +142,19 @@ public class IpLockUsers {
                                     if (fields.length >= 2) {
                                         iplockUsers.put(fields[0].toLowerCase(), fields[1]);
                                     } else {
-                                        iplock.Log(Level.WARNING, String.format("unexpected line at %d in %s", (n + 1), iplockUsersFile.getName()));
+                                        IPLock.Log(Level.WARNING, String.format("unexpected line at %d in %s", (n + 1), iplockUsersFile.getName()));
                                     }
                                 }
                             } finally {
                                 in.close();
                             }
                         } catch (IOException ex) {
-                            iplock.Log(Level.SEVERE, "Error opening " + iplockUsersFile.getName() + " for reading", ex);
+                            IPLock.Log(Level.SEVERE, "Error opening " + iplockUsersFile.getName() + " for reading", ex);
                         } finally {
                             try {
                                 fstream.close();
                             } catch (IOException ex) {
-                                iplock.Log(Level.SEVERE, "Error closing " + iplockUsersFile.getName(), ex);
+                                IPLock.Log(Level.SEVERE, "Error closing " + iplockUsersFile.getName(), ex);
                             }
                         }
                         return true;
@@ -181,18 +181,22 @@ public class IpLockUsers {
         }
     }
 
-    public boolean isValid(String name, String ip) {
+    public boolean isValid(String name, String ip, boolean allowNew) {
         if (!isNameOnList(name.toLowerCase())) {
-            // create user
-            iplock.Log("Allowing " + name + " because they are new!");
-            setUser(name, ip);
-            return true;
+            if (allowNew) {
+                // create user
+                IPLock.Log("Allowing " + name + " because they are new!");
+                setUser(name, ip);
+                return true;
+            } else {
+                return false;
+            }
         } else {
             String lastip = iplockUsers.get(name.toLowerCase());
             if (lastip.equals(ip)) {
-                iplock.Log("Allowing " + name + " because their ip matches");
+                IPLock.Log("Allowing " + name + " because their ip matches");
                 return true;
-            } else if (iplock.config.checkSubnet) {
+            } else if (IPLock.config.checkSubnet) {
                 // check if player is on the same subnet
                 //java.net.InetAddress inetAddthem;
                 //try {
@@ -205,25 +209,25 @@ public class IpLockUsers {
                 String ippart2 = lastip.split("\\.")[1];
 
                 if (ip.split("\\.")[0].equalsIgnoreCase(ippart1) && ip.split("\\.")[1].equalsIgnoreCase(ippart2)) {
-                    iplock.Log("Allowing " + name + " from " + ip + " because they are on same subnet");
+                    IPLock.Log("Allowing " + name + " from " + ip + " because they are on same subnet");
                     setUser(name, ip);
                     return true;
                 }
                 //} catch (UnknownHostException e1) {
-                //    iplock.Log(Level.SEVERE, "Error retrieving user ip");
-                //    iplock.Log(e1);
+                //    IPLock.Log(Level.SEVERE, "Error retrieving user ip");
+                //    IPLock.Log(e1);
                 //}
-                iplock.Log("DENIED " + name + " from " + ip + " because they are on the list but not on the same subnet");
+                IPLock.Log("DENIED " + name + " from " + ip + " because they are on the list but not on the same subnet");
                 return false;
             }
         }
-        iplock.Log("DENIED " + name + " from " + ip + " (ip mismatch)");
+        IPLock.Log("DENIED " + name + " from " + ip + " (ip mismatch)");
         return false;
 
     }
 
     public boolean setUser(String name, String ip) {
-        if (iplock.config.useMySQL() && MySQL_list != null) {
+        if (IPLock.config.useMySQL() && MySQL_list != null) {
             try {
                 if (ip.length() == 0) {
                     MySQL_list.RemoveUser(name);
@@ -231,10 +235,8 @@ public class IpLockUsers {
                     MySQL_list.SetUser(name.toLowerCase(), ip);
                 }
                 return true;
-            } catch (SQLException ex) {
-                iplock.Log(Level.SEVERE, null, ex);
             } catch (Exception ex) {
-                iplock.Log(Level.SEVERE, null, ex);
+                IPLock.Log(Level.SEVERE, ex.getMessage(), ex);
             }
         } else { // databaseType == DBType.FLATFILE
             if (iplockUsersFile != null) {
@@ -260,12 +262,12 @@ public class IpLockUsers {
                             out.close();
                         }
                     } catch (IOException ex) {
-                        iplock.Log(Level.SEVERE, "Error opening " + iplockUsersFile.getName() + " for writing", ex);
+                        IPLock.Log(Level.SEVERE, "Error opening " + iplockUsersFile.getName() + " for writing", ex);
                     } finally {
                         try {
                             fstream.close();
                         } catch (IOException ex) {
-                            iplock.Log(Level.SEVERE, "Error closing " + iplockUsersFile.getName(), ex);
+                            IPLock.Log(Level.SEVERE, "Error closing " + iplockUsersFile.getName(), ex);
                         }
                     }
                     return true;
@@ -274,5 +276,5 @@ public class IpLockUsers {
         }
         return false;
     }
-} // end class IpLockUsers
+} // end class IPLockUsers
 

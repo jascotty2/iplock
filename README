@@ -3,17 +3,62 @@ iplock - limit 1 ip address per player
 Commands: 
 iplock (ipl) reload	reloads plugin configuration
 iplock	reset <user>	reset (delete) ip info for this user, so they can login
+passwd (pass, password)	input the password to unlock (if locked) (optional)
+
+Features:
+
+- Prevents players from hogging resources / multi-boxing
+- Prevents players from account sharing
+- Forces players to use a static ip instead of dhcp to access their characters
+- Provides an additional layer of security to prevent users breaking into admin accounts
+- Can block names that are too long or contain special chars
+- Can be set with a password that players can join & update their IP with
+- until password is entered: 
+-- can't move
+-- can't break or place blocks
+-- can't drop items (or pick them up)
+-- monsters will ignore the player
+-- invulnerable to damage
+-- cannot issue server commands (like /pay user)
+- Password can be entered into chat, or with /passwd
+
+TODO:
+
+password database: players can change their password from default (save as md5 hash)
+add strings section to config to allow custom messages
 
 
 Changelog:
 
-Version 1.0 - jascotty2
+Version 1.1 - ? - jascotty2
+underscore added to allowed chars
+updated for 602
+explicitly allowed names can bypass length & char check
+changed old class names to better programming conventions
+updated MySQL class to check for unexpected db disconnects
+added option to lock out players until password is provided
+until password is entered: 
+- can't move
+- can't break or place blocks
+- can't drop items (or pick them up)
+- monsters will ignore the player
+- invulnerable to damage
+- cannot issue server commands (like /pay user)
+-- known bugs: 
+		player can still use & damage tools, like a sword (and attack other players with tools)
+		items dropped from the inventory screen are lost (only one is saved)
+
+
+
+Version 1.0 - 3/17/11 - jascotty2
 added configuration file
 user db is not (permamently) cached - read in at each check
 MySQL support
 grabs ip, not the hostname
 added OP commands for plugin management
 can list users to check or ignore check
+removed timer autosave: is now saved on edit
+
 
 
 Version 0.024

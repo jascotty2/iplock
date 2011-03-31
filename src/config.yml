@@ -8,7 +8,7 @@ checkSubnet: true
 # block users if name is not alphanumerical?
 blockSpecialChars: true
 
-# max username length allowed to login
+# max username length allowed to login (0 to disable)
 max_namelen: 20
 
 # will hold a temp. user cache in plugin, to lower resource usage during a login
@@ -39,4 +39,20 @@ MySQL:
 # none (default) - everyone is checked
 checkOption: none
 # list of users to apply the above rule to (space or comma-delimited)
-users: 
+users:
+
+
+# option to not kick, but to freeze users until they insert a password to unlock their ip
+passwordUpdate: false
+# new users require a password to start?
+passwordLock: false
+# what a user needs to enter to unlock or start (caSe-SensiTive)
+defaultPass: password
+# how long before auto-kick (0 for disabled)
+#   positive integer values only, units being s(econds) m(inutes) (default: s)
+passTimeout: 30s
+# tries before locked out
+maxAttempts: 3
+# time before allowed to try again (saved in memory, lost on server restart)
+#   positive integer values only, units being s(econds) m(inutes) h(hours) d(ays) w(eeks) M(onths) (default: m)
+retryTime: 1h
