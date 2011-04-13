@@ -2,6 +2,9 @@
 ##      IpLock Configuration         ##
 #######################################
 
+# if multiple players from the same ip are blocked
+noOnlineIP: true
+
 # whether names should be checked to be frem the same subnet as before if ip is different
 checkSubnet: true
 

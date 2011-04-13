@@ -30,7 +30,7 @@ public class IPLockConfig {
     protected ArrayList<String> userList = new ArrayList<String>();
     protected UserListAction userListMode = UserListAction.NONE;
 
-    public boolean passwordUpdate = false, passwordLock = false;
+    public boolean passwordUpdate = false, passwordLock = false, noOnlineIP = true;
     public String defaultPass = "password";
     public long passTimeout = 30, retryTime = 3600;
     public int maxAttempts = 3;
@@ -85,6 +85,15 @@ public class IPLockConfig {
         } else {
             Configuration config = new Configuration(configfile);
             config.load();
+            
+            noOnlineIP = config.getBoolean("noOnlineIP", noOnlineIP);
+
+            checkSubnet = config.getBoolean("checkSubnet", checkSubnet);
+            blockSpecialChars = config.getBoolean("blockSpecialChars", blockSpecialChars);
+            max_namelen = config.getInt("max_namelen", max_namelen);
+
+            tableName = config.getString("tableName", tableName).replace(" ", "_");
+
             cacheTTL = config.getInt("tempCacheTTL", cacheTTL);
 
             databaseType = config.getBoolean("useMySQLUserDB", false) ? DBType.MYSQL : DBType.FLATFILE;

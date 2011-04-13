@@ -30,7 +30,13 @@ add strings section to config to allow custom messages
 
 Changelog:
 
-Version 1.1 - ? - jascotty2
+Version 1.1.1 - 4/13/11 - jascotty2
+added option to disallow multiple players from the same ip
+updated options that weren't being loaded
+updated classes to prevent conflicts with my other plugins
+
+
+Version 1.1 - 3/31/11 - jascotty2
 underscore added to allowed chars
 updated for 602
 explicitly allowed names can bypass length & char check

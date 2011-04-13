@@ -1,6 +1,6 @@
 name: iplock
 main: net.gamerservices.iplock.IPLock
-version: 1.1
+version: 1.1.1
 author: mixxit and jascotty2
 website: http://www.gamerservices.net , https://github.com/jascotty2/iplock
 description: >
@@ -13,5 +13,5 @@ commands:
     passwd:
         description: password to unlock & change your ip
         usage: /<command> <password>
-        aliases: [password, pass]
+        aliases: [password, pass, p]
    
