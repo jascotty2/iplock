@@ -1,8 +1,8 @@
 name: iplock
-main: net.gamerservices.iplock.IPLock
-version: 1.1.1
-author: mixxit and jascotty2
-website: http://www.gamerservices.net , https://github.com/jascotty2/iplock
+main: me.jascotty2.iplock.IPLock
+version: 1.2.1
+author: jascotty2
+website: https://github.com/jascotty2/iplock
 description: >
     prevents users from logging in from multiple ip addresses (two boxing prevention)
 commands:

@@ -30,10 +30,21 @@ add strings section to config to allow custom messages
 
 Changelog:
 
+Version 1.2.1 - 3/5/12
+quick fix - added old config classes so still works
+
+
+Version 1.2 - 2/28/12 - (moved project package to my namespace, since mixxit is no longer maintaining)
+updated to new bukkit api
+general code cleanup
+
+
 Version 1.1.1 - 4/13/11 - jascotty2
 added option to disallow multiple players from the same ip
 updated options that weren't being loaded
 updated classes to prevent conflicts with my other plugins
+fixed remove player errors
+playerjoin, playerleave messages (for kicked players) changed to "<player> kicked: <reason>"
 
 
 Version 1.1 - 3/31/11 - jascotty2
